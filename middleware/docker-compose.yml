@@ -1,0 +1,54 @@
+version: "3"
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
+services:
+  node:
+    container_name: "im-lost-app-middleware"
+    build: ./node/
+    ports:
+      - "8090:8090"
+    networks:
+      - app-network
+    restart: on-failure
+
+  nginx:
+    container_name: "nginx"
+    build: ./nginx/
+    network_mode: "host"
+    ports:
+      - "5000:5000"
+
+  prometheus:
+    container_name: "prometheus"
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus-data/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    links:
+      - node:node
+    networks:
+      - app-network
+    restart: always
+
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
