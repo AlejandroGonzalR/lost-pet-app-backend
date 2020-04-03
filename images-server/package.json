@@ -1,10 +1,21 @@
 {
-  "name": "im-lost-app-images",
+  "name": "lost-pet-app-images-server",
+  "description": "Image storage of Lost Pet App",
   "version": "1.0.0",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "body-parser": "latest",
     "express": "^4.17.1",
     "morgan": "^1.9.1",
     "winston": "^3.2.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlejandroGonzalR/lost-pet-app-backend"
+  },
+  "keywords": [],
+  "author": "Alejandro González Rodríguez",
+  "license": "MIT"
 }
