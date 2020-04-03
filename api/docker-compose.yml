@@ -1,0 +1,27 @@
+version: '3.4'
+services:
+  node:
+    container_name: "app-backend"
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - "5001:5001"
+    network_mode: "host"
+    command: "./bin/entrypoint.sh"
+    restart: on-failure
+
+  postgres:
+    container_name: "postgres"
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: docker
+    volumes:
+      - ./bin/init.sql:/docker-entrypoint-initdb.d/init.sql
+    network_mode: "host"
+
+networks:
+  overnet:
+    external: true
