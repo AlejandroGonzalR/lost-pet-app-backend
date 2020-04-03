@@ -31,7 +31,7 @@ const httpRequestDurationMicroseconds = new Prometheus.Histogram({
 
 // App
 const app = express();
-Sentry.init({ dsn: 'https://4fc2e69f60964963aee2667d62f79200@sentry.io/1782956' });
+Sentry.init({ dsn: process.env.SENTRY_DSN });
 app.use(Sentry.Handlers.requestHandler());
 app.use(bodyParser.json());
 app.use(
@@ -43,7 +43,6 @@ app.use(
 app.get('/', function (req, res, next) {
     res.json({ message: 'Hey! I`m here' });
     next();
-    // res.send('Hey! I`m here');
 });
 
 app.get('/debug-sentry', function mainHandler(req, res) {

@@ -54,10 +54,10 @@ function sendImageCode(encodedImage, title) {
             image: encodedImage,
             title: title
         })
-        .then((response) => {
+        .then(() => {
             logger.info('Sending request to Image Server');
         })
         .catch((error) => {
-            logger.error('Error sending request to Image Server');
+            logger.error('Error sending request to Image Server', error);
         });
 }

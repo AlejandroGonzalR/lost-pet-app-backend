@@ -1,17 +1,17 @@
 module.exports = {
     server: {
-        port: 5001,
+        port: 10000,
         host: '0.0.0.0'
     },
     imageServer: {
-        port: 5002,
-        host: '0.0.0.0'
+        port: 10001,
+        host: 'images_server'
     },
     database: {
         port: 5432,
-        host: 'localhost',
+        host: 'postgres',
         user: 'manager',
-        password: 'manager.test',
-        database: 'app'
+        password: process.env.POSTGRES_PASSWORD,
+        database: process.env.DATABASE_NAME
     }
 };

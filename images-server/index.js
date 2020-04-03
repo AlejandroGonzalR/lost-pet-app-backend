@@ -9,8 +9,6 @@ const config = require('./config');
 
 const path = require('path');
 
-
-
 const logger = winston.createLogger({
     transports: [
         new winston.transports.Console()
@@ -18,8 +16,7 @@ const logger = winston.createLogger({
 });
 
 // Constants
-const PORT = config.server.port;
-const HOST = config.server.host;
+const PORT = process.env.PORT | config.server.port;
 
 // App
 const app = express();
@@ -38,7 +35,6 @@ app.post('/images', function (req, res) {
 });
 
 function createImage(encodedImage, title) {
-    console.log(title)
     let buf = Buffer.from(encodedImage, 'base64');
     fs.writeFile(path.join(__dirname, '/images/', `${title}.png`), buf, function(error){
         if(error){
@@ -58,5 +54,5 @@ app.use((req, res, next) => {
     next();
 });
 
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+app.listen(PORT);
+console.log(`Running on http://localhost:${PORT}`);

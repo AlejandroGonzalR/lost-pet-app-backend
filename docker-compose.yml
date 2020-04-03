@@ -1,27 +1,87 @@
 version: '3.4'
 services:
   node:
-    container_name: "app-backend"
-    build: .
+    container_name: "backend"
+    build:
+      context: api
     depends_on:
       - postgres
     ports:
-      - "5001:5001"
-    network_mode: "host"
+      - "10000:10000"
+    environment:
+      POSTGRES_PASSWORD: $DATABASE_PASS
+      DATABASE_NAME: "app"
     command: "./bin/entrypoint.sh"
     restart: on-failure
-
+    networks:
+      - net
   postgres:
     container_name: "postgres"
     image: postgres
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: docker
+      POSTGRES_PASSWORD: $POSTGRES_PASS
     volumes:
-      - ./bin/init.sql:/docker-entrypoint-initdb.d/init.sql
-    network_mode: "host"
-
+      - ./api/bin/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - net
+  images_server:
+    container_name: "images"
+    build:
+      context: images-server
+    ports:
+      - "10001:10001"
+    restart: always
+    networks:
+      - net
+  middleware:
+    container_name: "middleware"
+    build:
+      context: middleware/node
+    ports:
+      - "8090:8090"
+    environment:
+      SENTRY_DSN: "https://4fc2e69f60964963aee2667d62f79200@sentry.io/1782956"
+    networks:
+      - net
+    restart: on-failure
+  nginx:
+    container_name: "nginx"
+    build:
+      context: middleware/nginx
+    networks:
+      net:
+    ports:
+      - "5000:5000"
+  prometheus:
+    container_name: "prometheus"
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./middleware/prometheus-data/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    links:
+      - middleware:middleware
+    networks:
+      - net
+    restart: always
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - net
+    restart: always
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
 networks:
-  overnet:
-    external: true
+  net:
